@@ -2,10 +2,10 @@ package org.skypro.skyshop.basket;
 import org.skypro.skyshop.product.Product;
 
 public class ProductBasket {
-    private Product[] products = new Product[3]; // Все продукты будут в массиве
+    private Product[] products = new Product[3]; // Массив для хранения товаров
     private int count = 0;
 
-    // Добавление продукта
+    // Добавление продукта (без изменений оставляем как было)
     public void addProduct(Product product) {
         if (count < 3) {
             products[count] = product;
@@ -15,7 +15,7 @@ public class ProductBasket {
         }
     }
 
-    // Общая стоимость
+    // Общая стоимость (без изменений-оставляем как было)
     public int getTotalPrice() {
         int total = 0;
         for (int i = 0; i < count; i++) {
@@ -24,7 +24,7 @@ public class ProductBasket {
         return total;
     }
 
-    // Печать содержимого
+    // ПЕРЕРАБОТАННЫЙ МЕТОД ВЫВОДА КОРЗИНЫ-тут поменяли
     public void printBasket() {
         if (count == 0) {
             System.out.println("В корзине пусто");
@@ -32,15 +32,24 @@ public class ProductBasket {
         }
 
         System.out.println("--- Содержимое корзины ---");
+        int specialCount = 0; // Счётчик специальных товаров
+
         for (int i = 0; i < count; i++) {
             Product p = products[i];
-            System.out.println(p.getNameOfProduct() + ": " + p.getPriceOfProduct() + " руб.");
+            // Используем переопределённый toString() каждого товара
+            System.out.println(p.toString()); // <-- Главное изменение!
+
+            if (p.isSpecial()) { // Увеличиваем счётчик для специальных товаров
+                specialCount++;
+            }
         }
+
         System.out.println("--------------------------");
         System.out.println("Итого: " + getTotalPrice() + " руб.");
+        System.out.println("Специальных товаров: " + specialCount); // <-- Новый вывод
     }
 
-    // Проверка наличия
+    // Проверка наличия (без изменений)
     public boolean containsProduct(String name) {
         for (int i = 0; i < count; i++) {
             if (products[i].getNameOfProduct().equalsIgnoreCase(name)) {
@@ -50,13 +59,12 @@ public class ProductBasket {
         return false;
     }
 
-    // Очистка корзины
+    // Очистка корзины (без изменений)
     public void clearBasket() {
         for (int i = 0; i < count; i++) {
             products[i] = null;
         }
         count = 0;
         System.out.println("Корзина очищена!");
-
     }
 }
