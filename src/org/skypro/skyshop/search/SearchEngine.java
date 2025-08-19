@@ -1,44 +1,40 @@
 package org.skypro.skyshop.search;
 
 import org.skypro.skyshop.exeptions.BestResultNotFound;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SearchEngine {
-    private final Searchable[] searchableItems;
-    private int currentSize;
+    // Заменяем массив на список
+    private final List<Searchable> searchableItems = new ArrayList<>();
 
-    public SearchEngine(int capacity) {
-        this.searchableItems = new Searchable[capacity];
-        this.currentSize = 0;
+    // Конструктор теперь без параметров (емкость не нужна)
+    public SearchEngine() {
     }
 
+    // Добавление элемента (теперь без ограничений)
     public void add(Searchable item) {
-        if (currentSize < searchableItems.length) {
-            searchableItems[currentSize] = item;
-            currentSize++;
-        }
+        searchableItems.add(item);
     }
 
-    public Searchable[] search(String query) throws BestResultNotFound {
-        Searchable[] results = new Searchable[5];
-        int resultCount = 0;
+    // Поиск ВСЕХ результатов (без ограничения в 5)
+    public List<Searchable> search(String query) throws BestResultNotFound {
+        List<Searchable> results = new ArrayList<>();
 
-        for (int i = 0; i < currentSize && resultCount < 5; i++) {
-            if (searchableItems[i] != null &&
-                    searchableItems[i].getSearchTerm().toLowerCase()
-                            .contains(query.toLowerCase())) {
-                results[resultCount++] = searchableItems[i];
+        for (Searchable item : searchableItems) {
+            if (item.getSearchTerm().toLowerCase().contains(query.toLowerCase())) {
+                results.add(item);
             }
         }
 
-        if (resultCount == 0) {
+        if (results.isEmpty()) {
             throw new BestResultNotFound(query);
         }
 
-        Searchable[] finalResults = new Searchable[resultCount];
-        System.arraycopy(results, 0, finalResults, 0, resultCount);
-        return finalResults;
+        return results;
     }
 
+    // Метод findBestMatch остаётся почти без изменений
     public Searchable findBestMatch(String search) throws BestResultNotFound {
         if (search == null || search.isBlank()) {
             throw new IllegalArgumentException("Поисковый запрос не может быть пустым");
@@ -47,17 +43,14 @@ public class SearchEngine {
         Searchable bestMatch = null;
         int maxCount = -1;
 
-        for (int i = 0; i < currentSize; i++) {
-            Searchable item = searchableItems[i];
-            if (item != null) {
-                String searchTerm = item.getSearchTerm().toLowerCase();
-                String searchLower = search.toLowerCase();
-                int count = countSubstringOccurrences(searchTerm, searchLower);
+        for (Searchable item : searchableItems) {
+            String searchTerm = item.getSearchTerm().toLowerCase();
+            String searchLower = search.toLowerCase();
+            int count = countSubstringOccurrences(searchTerm, searchLower);
 
-                if (count > maxCount) {
-                    maxCount = count;
-                    bestMatch = item;
-                }
+            if (count > maxCount) {
+                maxCount = count;
+                bestMatch = item;
             }
         }
 
@@ -68,6 +61,7 @@ public class SearchEngine {
         return bestMatch;
     }
 
+    // Этот метод остаётся без изменений
     private int countSubstringOccurrences(String str, String substring) {
         int count = 0;
         int index = 0;
