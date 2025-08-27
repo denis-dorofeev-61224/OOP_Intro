@@ -1,29 +1,27 @@
 package org.skypro.skyshop.search;
 
 import org.skypro.skyshop.exeptions.BestResultNotFound;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class SearchEngine {
-    // Заменяем массив на список
     private final List<Searchable> searchableItems = new ArrayList<>();
 
-    // Конструктор теперь без параметров (емкость не нужна)
     public SearchEngine() {
     }
 
-    // Добавление элемента (теперь без ограничений)
     public void add(Searchable item) {
         searchableItems.add(item);
     }
 
-    // Поиск ВСЕХ результатов (без ограничения в 5)
-    public List<Searchable> search(String query) throws BestResultNotFound {
-        List<Searchable> results = new ArrayList<>();
+    // ИЗМЕНЕНИЕ: возвращаем Map вместо List
+    public Map<String, Searchable> search(String query) throws BestResultNotFound {
+        // Используем TreeMap для автоматической сортировки по ключам (именам)
+        Map<String, Searchable> results = new TreeMap<>();
 
         for (Searchable item : searchableItems) {
             if (item.getSearchTerm().toLowerCase().contains(query.toLowerCase())) {
-                results.add(item);
+                // Ключ - имя объекта, значение - сам объект
+                results.put(item.getName(), item);
             }
         }
 
@@ -34,7 +32,7 @@ public class SearchEngine {
         return results;
     }
 
-    // Метод findBestMatch остаётся почти без изменений
+    // findBestMatch остаётся без изменений
     public Searchable findBestMatch(String search) throws BestResultNotFound {
         if (search == null || search.isBlank()) {
             throw new IllegalArgumentException("Поисковый запрос не может быть пустым");
@@ -61,7 +59,6 @@ public class SearchEngine {
         return bestMatch;
     }
 
-    // Этот метод остаётся без изменений
     private int countSubstringOccurrences(String str, String substring) {
         int count = 0;
         int index = 0;

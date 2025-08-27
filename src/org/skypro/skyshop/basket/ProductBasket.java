@@ -1,38 +1,57 @@
 package org.skypro.skyshop.basket;
 
 import org.skypro.skyshop.product.Product;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
+import java.util.*;
 
 public class ProductBasket {
-    // Заменяем массив на список
-    private final List<Product> products = new ArrayList<>();
+    // ЗАМЕНА: List<Product> -> Map<String, List<Product>>
+    private final Map<String, List<Product>> productsMap = new HashMap<>();
 
-    // Добавление продукта (теперь без ограничений)
+    // Добавление продукта
     public void addProduct(Product product) {
-        products.add(product);
+        String productName = product.getNameOfProduct();
+
+        // НОВАЯ ЛОГИКА: проверяем есть ли уже такое имя в мапе
+        if (productsMap.containsKey(productName)) {
+            // Если есть - добавляем в существующий список
+            productsMap.get(productName).add(product);
+        } else {
+            // Если нет - создаем новый список и кладем в мапу
+            List<Product> productList = new ArrayList<>();
+            productList.add(product);
+            productsMap.put(productName, productList);
+        }
     }
 
     // Общая стоимость
     public int getTotalPrice() {
         int total = 0;
-        for (Product product : products) {
-            total += product.getPriceOfProduct();
+        // ИЗМЕНЕНИЕ: перебираем значения мапы (каждый значение - список продуктов)
+        for (List<Product> productList : productsMap.values()) {
+            for (Product product : productList) {
+                total += product.getPriceOfProduct();
+            }
         }
         return total;
     }
 
     // Печать содержимого
     public void printBasket() {
-        if (products.isEmpty()) {
+        if (productsMap.isEmpty()) {
             System.out.println("В корзине пусто");
             return;
         }
 
         System.out.println("--- Содержимое корзины ---");
-        for (Product product : products) {
-            System.out.println(product.getNameOfProduct() + ": " + product.getPriceOfProduct() + " руб.");
+        // ИЗМЕНЕНИЕ: перебираем все записи мапы
+        for (Map.Entry<String, List<Product>> entry : productsMap.entrySet()) {
+            String productName = entry.getKey();
+            List<Product> productList = entry.getValue();
+
+            // Для каждого продукта в списке выводим информацию
+            for (Product product : productList) {
+                System.out.println(productName + ": " + product.getPriceOfProduct() + " руб.");
+            }
         }
         System.out.println("--------------------------");
         System.out.println("Итого: " + getTotalPrice() + " руб.");
@@ -40,33 +59,22 @@ public class ProductBasket {
 
     // Проверка наличия
     public boolean containsProduct(String name) {
-        for (Product product : products) {
-            if (product.getNameOfProduct().equalsIgnoreCase(name)) {
-                return true;
-            }
-        }
-        return false;
+        // УЛУЧШЕНИЕ: теперь проверка за O(1) вместо O(n)
+        return productsMap.containsKey(name);
     }
 
     // Очистка корзины
     public void clearBasket() {
-        products.clear();
+        productsMap.clear();
         System.out.println("Корзина очищена!");
     }
 
-    // Удаление всех продуктов с указанным именем (без учёта регистра)
+    // Удаление всех продуктов с указанным именем
     public List<Product> removeProductByName(String name) {
-        List<Product> removedProducts = new ArrayList<>();
-        Iterator<Product> iterator = products.iterator();
-
-        while (iterator.hasNext()) {
-            Product product = iterator.next();
-            if (product.getNameOfProduct().equalsIgnoreCase(name)) {
-                removedProducts.add(product);
-                iterator.remove();
-            }
+        // УЛУЧШЕНИЕ: теперь удаление за O(1) вместо O(n)
+        if (productsMap.containsKey(name)) {
+            return productsMap.remove(name);
         }
-
-        return removedProducts;
+        return new ArrayList<>();
     }
 }
