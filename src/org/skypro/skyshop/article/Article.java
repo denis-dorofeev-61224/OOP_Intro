@@ -1,5 +1,6 @@
 package org.skypro.skyshop.article;
 import org.skypro.skyshop.search.Searchable;
+import java.util.Objects; // ← ДОБАВЛЯЕМ ЭТОТ ИМПОРТ
 
 public class Article implements Searchable  {
     //добавляем поля по условию п.1
@@ -40,6 +41,19 @@ public class Article implements Searchable  {
     @Override
     public String getName() {
         return articleTitle; // Возвращаем название статьи как имя
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Article article = (Article) o;
+        return Objects.equals(articleTitle, article.articleTitle);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(articleTitle);
     }
 
 }

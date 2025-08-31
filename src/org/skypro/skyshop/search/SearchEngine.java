@@ -1,26 +1,27 @@
 package org.skypro.skyshop.search;
 
 import org.skypro.skyshop.exeptions.BestResultNotFound;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class SearchEngine {
-    private final List<Searchable> searchableItems = new ArrayList<>();
+    // ЗАМЕНА: List на Set (HashSet)
+    private final Set<Searchable> searchableItems = new HashSet<>();
 
     public SearchEngine() {
     }
 
     public void add(Searchable item) {
-        searchableItems.add(item);
+        searchableItems.add(item); // HashSet автоматически игнорирует дубликаты
     }
 
-    // ИЗМЕНЕНИЕ: возвращаем Map вместо List
     public Map<String, Searchable> search(String query) throws BestResultNotFound {
-        // Используем TreeMap для автоматической сортировки по ключам (именам)
         Map<String, Searchable> results = new TreeMap<>();
 
         for (Searchable item : searchableItems) {
             if (item.getSearchTerm().toLowerCase().contains(query.toLowerCase())) {
-                // Ключ - имя объекта, значение - сам объект
                 results.put(item.getName(), item);
             }
         }
@@ -32,7 +33,6 @@ public class SearchEngine {
         return results;
     }
 
-    // findBestMatch остаётся без изменений
     public Searchable findBestMatch(String search) throws BestResultNotFound {
         if (search == null || search.isBlank()) {
             throw new IllegalArgumentException("Поисковый запрос не может быть пустым");
