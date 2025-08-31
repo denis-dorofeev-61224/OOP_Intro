@@ -10,7 +10,7 @@ import org.skypro.skyshop.search.SearchEngine;
 import org.skypro.skyshop.search.Searchable;
 
 import java.util.List;
-import java.util.Map; // ДОБАВЛЯЕМ ИМПОРТ
+import java.util.Set; // ЗАМЕНА: Map на Set
 
 public class Main {
     public static void main(String[] args) {
@@ -54,7 +54,7 @@ public class Main {
 
         // 6. Тестирование SearchEngine с обработкой исключений
         System.out.println("\n=== Тест 3: SearchEngine ===");
-        SearchEngine engine = new SearchEngine(); // Без параметров!
+        SearchEngine engine = new SearchEngine();
 
         // Добавляем все объекты
         engine.add(bag1);
@@ -74,8 +74,8 @@ public class Main {
         // Поиск 1: Успешный случай
         try {
             System.out.println("Поиск 'ракушка':");
-            Map<String, Searchable> results = engine.search("ракушка"); // ИЗМЕНЕНИЕ: Map вместо List
-            for (Searchable result : results.values()) { // ИЗМЕНЕНИЕ: перебираем values()
+            Set<Searchable> results = engine.search("ракушка"); // ЗАМЕНА: Map на Set
+            for (Searchable result : results) { // ЗАМЕНА: убрали .values()
                 System.out.println("- " + result.getStringRepresentation());
             }
         } catch (BestResultNotFound e) {
@@ -85,8 +85,8 @@ public class Main {
         // Поиск 2: Успешный случай (широкий запрос)
         try {
             System.out.println("\nПоиск 'сумка':");
-            Map<String, Searchable> results = engine.search("сумка"); // ИЗМЕНЕНИЕ: Map вместо List
-            for (Searchable result : results.values()) { // ИЗМЕНЕНИЕ: перебираем values()
+            Set<Searchable> results = engine.search("сумка"); // ЗАМЕНА: Map на Set
+            for (Searchable result : results) { // ЗАМЕНА: убрали .values()
                 System.out.println("- " + result.getStringRepresentation());
             }
         } catch (BestResultNotFound e) {
@@ -96,8 +96,8 @@ public class Main {
         // Поиск 3: Специальный тест исключения
         try {
             System.out.println("\nПоиск 'несуществующий_запрос':");
-            Map<String, Searchable> results = engine.search("несуществующий_запрос"); // ИЗМЕНЕНИЕ: Map вместо List
-            for (Searchable result : results.values()) { // ИЗМЕНЕНИЕ: перебираем values()
+            Set<Searchable> results = engine.search("несуществующий_запрос"); // ЗАМЕНА: Map на Set
+            for (Searchable result : results) { // ЗАМЕНА: убрали .values()
                 System.out.println("- " + result.getStringRepresentation());
             }
         } catch (BestResultNotFound e) {
@@ -110,8 +110,8 @@ public class Main {
         // Тест пустого запроса
         try {
             System.out.println("Поиск пустой строки:");
-            Map<String, Searchable> results = engine.search(""); // ИЗМЕНЕНИЕ: Map вместо List
-            for (Searchable result : results.values()) { // ИЗМЕНЕНИЕ: перебираем values()
+            Set<Searchable> results = engine.search(""); // ЗАМЕНА: Map на Set
+            for (Searchable result : results) { // ЗАМЕНА: убрали .values()
                 System.out.println("- " + result.getStringRepresentation());
             }
         } catch (BestResultNotFound e) {
@@ -121,8 +121,8 @@ public class Main {
         // Тест null-запроса
         try {
             System.out.println("\nПоиск null:");
-            Map<String, Searchable> results = engine.search(null); // ИЗМЕНЕНИЕ: Map вместо List
-            for (Searchable result : results.values()) { // ИЗМЕНЕНИЕ: перебираем values()
+            Set<Searchable> results = engine.search(null); // ЗАМЕНА: Map на Set
+            for (Searchable result : results) { // ЗАМЕНА: убрали .values()
                 System.out.println("- " + result.getStringRepresentation());
             }
         } catch (BestResultNotFound e) {
