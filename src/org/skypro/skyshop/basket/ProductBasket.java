@@ -2,40 +2,32 @@ package org.skypro.skyshop.basket;
 
 import org.skypro.skyshop.product.Product;
 import java.util.*;
+import java.util.stream.Collectors; // Добавляем импорт
 
 public class ProductBasket {
-    // ЗАМЕНА: List<Product> -> Map<String, List<Product>>
     private final Map<String, List<Product>> productsMap = new HashMap<>();
 
-    // Добавление продукта
     public void addProduct(Product product) {
         String productName = product.getNameOfProduct();
-
-        // НОВАЯ ЛОГИКА: проверяем есть ли уже такое имя в мапе
         if (productsMap.containsKey(productName)) {
-            // Если есть - добавляем в существующий список
             productsMap.get(productName).add(product);
         } else {
-            // Если нет - создаем новый список и кладем в мапу
             List<Product> productList = new ArrayList<>();
             productList.add(product);
             productsMap.put(productName, productList);
         }
     }
 
-    // Общая стоимость
+    // ПЕРЕПИСАННЫЙ МЕТОД: Общая стоимость через Stream API
     public int getTotalPrice() {
-        int total = 0;
-        // ИЗМЕНЕНИЕ: перебираем значения мапы (каждый значение - список продуктов)
-        for (List<Product> productList : productsMap.values()) {
-            for (Product product : productList) {
-                total += product.getPriceOfProduct();
-            }
-        }
-        return total;
+        return productsMap.values() // Collection<List<Product>>
+                .stream()           // Stream<List<Product>>
+                .flatMap(Collection::stream) // Stream<Product> (преобразуем вложенные списки в плоский поток)
+                .mapToInt(Product::getPriceOfProduct) // IntStream (преобразуем каждый продукт в его цену)
+                .sum(); // Суммируем все цены
     }
 
-    // Печать содержимого
+    // ПЕРЕПИСАННЫЙ МЕТОД: Печать содержимого через Stream API
     public void printBasket() {
         if (productsMap.isEmpty()) {
             System.out.println("В корзине пусто");
@@ -43,35 +35,29 @@ public class ProductBasket {
         }
 
         System.out.println("--- Содержимое корзины ---");
-        // ИЗМЕНЕНИЕ: перебираем все записи мапы
-        for (Map.Entry<String, List<Product>> entry : productsMap.entrySet()) {
-            String productName = entry.getKey();
-            List<Product> productList = entry.getValue();
 
-            // Для каждого продукта в списке выводим информацию
-            for (Product product : productList) {
-                System.out.println(productName + ": " + product.getPriceOfProduct() + " руб.");
-            }
-        }
+        // Создаем плоский поток всех продуктов и выводим их
+        productsMap.values() // Collection<List<Product>>
+                .stream()    // Stream<List<Product>>
+                .flatMap(Collection::stream) // Stream<Product>
+                .forEach(product -> // Для каждого продукта выполняем вывод
+                        System.out.println(product.getNameOfProduct() + ": " + product.getPriceOfProduct() + " руб.")
+                );
+
         System.out.println("--------------------------");
-        System.out.println("Итого: " + getTotalPrice() + " руб.");
+        System.out.println("Итого: " + getTotalPrice() + " руб."); // Используем переписанный getTotalPrice()
     }
 
-    // Проверка наличия
     public boolean containsProduct(String name) {
-        // УЛУЧШЕНИЕ: теперь проверка за O(1) вместо O(n)
         return productsMap.containsKey(name);
     }
 
-    // Очистка корзины
     public void clearBasket() {
         productsMap.clear();
         System.out.println("Корзина очищена!");
     }
 
-    // Удаление всех продуктов с указанным именем
     public List<Product> removeProductByName(String name) {
-        // УЛУЧШЕНИЕ: теперь удаление за O(1) вместо O(n)
         if (productsMap.containsKey(name)) {
             return productsMap.remove(name);
         }

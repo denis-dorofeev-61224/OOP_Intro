@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors; //  Добавляем этот импорт
 
 public class SearchEngine {
     private final Set<Searchable> searchableItems = new HashSet<>();
@@ -16,16 +17,14 @@ public class SearchEngine {
         searchableItems.add(item);
     }
 
-    // ЗАМЕНА: TreeMap на TreeSet с компаратором
+    // ПЕРЕПИСАННЫЙ МЕТОД с использованием Stream API
     public Set<Searchable> search(String query) throws BestResultNotFound {
-        // TreeSet с компаратором для сортировки
-        Set<Searchable> results = new TreeSet<>(new SearchableComparator());
-
-        for (Searchable item : searchableItems) {
-            if (item.getSearchTerm().toLowerCase().contains(query.toLowerCase())) {
-                results.add(item); // Добавляем сам объект, а не в Map
-            }
-        }
+        // Используем Stream API для фильтрации и коллекции
+        Set<Searchable> results = searchableItems.stream() // Создаем стрим из всех элементов
+                .filter(item -> item.getSearchTerm().toLowerCase().contains(query.toLowerCase())) // Фильтруем
+                .collect(Collectors.toCollection( // Собираем в коллекцию
+                        () -> new TreeSet<>(new SearchableComparator()) // Supplier: создаем TreeSet с компаратором
+                ));
 
         if (results.isEmpty()) {
             throw new BestResultNotFound(query);
@@ -75,7 +74,7 @@ public class SearchEngine {
         return count;
     }
 
-    // Внутренний класс-компаратор для сортировки
+    // Внутренний класс-компаратор для сортировки (без изменений)
     private static class SearchableComparator implements Comparator<Searchable> {
         @Override
         public int compare(Searchable o1, Searchable o2) {
